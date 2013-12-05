@@ -1,5 +1,8 @@
+#ifndef passwordkeeper_crypt
+#define passwordkeeper_crypt
+
 #include <string.h>
-#include "defines.h"
+#include "defines.hpp"
 using namespace std;
 
 //MAI A CAPI
@@ -41,3 +44,5 @@ void decrypt ( char* text , char* dest ) { //prende sempre SOLO lettere o numeri
 	S[strlen(text)]='\0';
 	strcpy(dest,S);
 }
+
+#endif

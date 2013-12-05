@@ -1,50 +1,34 @@
+//TODO: Implementare l'import da file
+//TODO: Implementare l'export su file
+//TODO: Implementare i backup criptati.
+
 #include <cassert>
 #include <stdlib.h>
 #include <stdio.h>
 #include <vector>
 #include <cstring>
 #include <unistd.h>
-#include "defines.h"
+#include "defines.hpp"
 #include "crypt.hpp"
-//~ #include "variablesInitializer.hpp"
+#include "modifyList.hpp"
 using namespace std;
 
 char execCommand[1000], inputCommand[1000];
-char masterPassword[MAXPASSLEN];
-
-struct entry{
-	char place[MAXPLACELEN], user[MAXUSERLEN], pass[MAXPASSLEN];
-	void enc() {
-		encrypt(place,place);
-		encrypt(user,user);
-		encrypt(pass,pass);
-	}
-	void dec() {
-		decrypt(place,place);
-		decrypt(user,user);
-		decrypt(pass,pass);
-	}
-};
+char privateKey[MAXPRIVATEKEYLEN];
 
 vector <entry*> Entries;
 
-void fgets2(char* destination, int limitSize, FILE* source) {
-	fgets(destination, limitSize, source);
-	int l=strlen(destination);
-	if(l>=1 and destination[l-1]=='\n') destination[l-1]='\0';
-}
-
-char home[100], mainFolder[100], MasterEncryption[100], PasswordList[100];
+char home[100], mainFolder[100], privateKeyHash[100], PasswordList[100];
 void initPath() {
 	strcpy(home,getenv("HOME"));
 	strcpy(mainFolder,home);
 	strcat(mainFolder,"/.password-keeper");
-	strcpy(MasterEncryption,mainFolder);
-	strcat(MasterEncryption, "/.masterPasswordHash.txt");
+	strcpy(privateKeyHash,mainFolder);
+	strcat(privateKeyHash, "/.privateKeyHash.txt");
 	strcpy(PasswordList,mainFolder);
 	strcat(PasswordList, "/.passwordList.txt");
 	
-	//~ printf("%s %s %s %s", home, mainFolder, MasterEncryption, PasswordList);
+	//~ printf("%s %s %s %s", home, mainFolder, privateKeyHash, PasswordList);
 }
 
 void save() {
@@ -58,92 +42,6 @@ void save() {
 		//~ delete ee;
 	}
 	fclose(out);
-}
-
-vector <int> searchEntry( char* place ) {
-	vector <int> found;
-	for( int i=0;i<(int)Entries.size();i++) {
-		if( strcmp(Entries[i]->place , place) == 0 ) found.push_back(i);
-	}
-	return found;
-}
-
-void add( entry* val) {
-	vector <int> found=searchEntry(val->place);
-	int cc=found.size();
-	if ( cc == 0 ) {
-		Entries.push_back(val);
-		printf("Entry has been registered.\n");
-	}
-	else{
-		printf("%s has already some entries:\n", val->place );
-		for(int i=0;i<cc;i++){
-			printf("\t%d- User: %s ; Pass: %s\n",i+1,Entries[found[i]]->user, Entries[found[i]]->pass);
-		}
-		printf("Do you want to add a new entry (write new) or to update one of the entry (write its number)? ");
-		fgets2(inputCommand,10,stdin);
-		if( strcmp(inputCommand,"new") == 0 ) {
-			Entries.push_back(val);
-			printf("Entry has been registered.\n");
-		}
-		else {
-			int nn=atoi(inputCommand);
-			if ( 1<=nn and nn<=cc ) {
-				Entries[found[nn]]=val;
-				printf("Entry has been updated.\n");
-			}
-			else{
-				printf("You entered an invalid value.\n");
-			}
-		}
-	}
-	
-}
-
-void remove( char* place ) {
-	vector <int> found=searchEntry(place);
-	int cc=found.size();
-	if( cc==0 ) printf("The place %s isn't in the password list.\n", place);
-	else if( cc==1 ) {
-		Entries.erase(Entries.begin()+found[0]);
-		printf("Entry has been deleted.\n");
-	}
-	else {
-		printf("The place %s is present in more than one entry:\n", place);
-		for(int i=0;i<cc;i++){
-			printf("\t%d- User: %s ; Pass: %s\n",i+1,Entries[found[i]]->user, Entries[found[i]]->pass);
-		}
-		printf("Which (* for all) should I delete? ");
-		fgets2(inputCommand,10,stdin);
-		if( strcmp(inputCommand,"*") == 0 ) {
-			for(int i=cc-1; i>=0 ;i--) { //cancello dall'ultimo per non rompere i puntatori
-				assert( strcmp( Entries[found[i]]->place , place) == 0 );
-				Entries.erase(Entries.begin()+found[i]);
-			}
-			printf("All entries relative to %s have been deleted.\n",place);
-		}
-		else {
-			int nn=atoi(inputCommand);
-			if ( 1<=nn and nn<=cc ) {
-				Entries.erase(Entries.begin()+found[nn-1]);
-				printf("Entry has been deleted.\n");
-			}
-			else{
-				printf("You entered an invalid value.\n");
-			}
-		}
-	}
-}
-
-void retrieve( char* place ) {
-	vector <int> found=searchEntry(place);
-	int cc=found.size();
-	if( cc==0 ) printf("The place %s isn't in the password list.\n", place);
-	else {
-		for(int i=0;i<cc;i++) {
-			printf("\t%d- User: %s ; Pass : %s\n",i+1,Entries[found[i]]->user,Entries[found[i]]->pass);
-		}
-	}
 }
 
 void destroy () { //Deletes the folder if present
@@ -161,17 +59,17 @@ void init () {
 	
 	//TODO AGGIUNGERE ANCHE CONTROLLI SULLA PASSWORD
 	printf("Insert a password to encrypt your data: ");
-	fgets2(masterPassword,MASTERPASSLEN,stdin);
+	fgets2(privateKey,MAXPRIVATEKEYLEN,stdin);
 	
 	//Creates the new folder
 	strcpy(execCommand, "mkdir ");
 	strcat(execCommand,mainFolder);
 	system(execCommand);
 	
-	FILE* passOut= fopen(MasterEncryption, "w");
+	FILE* passOut= fopen(privateKeyHash, "w");
 	assert(passOut!=NULL);
 	char hashed[MAXHASHLEN];
-	hashPassword( masterPassword , hashed );
+	hashPassword( privateKey , hashed );
 	fprintf( passOut, "%s\n", hashed );
 	fclose(passOut);
 	
@@ -199,14 +97,14 @@ void readAllPass( ) {
 }
 
 int login () {
-	FILE* in =fopen(MasterEncryption,"r");
+	FILE* in =fopen(privateKeyHash,"r");
 	char realHash[MAXHASHLEN];
 	fgets2(realHash,MAXHASHLEN,in); //NON HA SPAZI
 	fclose(in);
 	
-	//~ printf("%s %s\n", realHash, encryptPassword( masterPassword ));
+	//~ printf("%s %s\n", realHash, encryptPassword( privateKey ));
 	char hashed[MAXHASHLEN];
-	hashPassword( masterPassword, hashed );
+	hashPassword( privateKey, hashed );
 	if ( strcmp( hashed , realHash ) != 0 ) {
 		printf("Password is incorrect, try again.\n");
 		return 1;
@@ -230,7 +128,7 @@ int main(){
 			triesCount++;
 			printf( "Password: " );
 			//TODO: this should take the password in **** mode.
-			fgets2(masterPassword, MASTERPASSLEN, stdin);
+			fgets2(privateKey, MAXPRIVATEKEYLEN, stdin);
 			printf("\n");
 		} while( login( ) == 1 );
 	}
@@ -271,6 +169,10 @@ int main(){
 			retrieve( place );
 		}
 		
+		else if( strcmp( inputCommand , "getAll" ) == 0 ) {
+			retrieveAll();
+		}
+		
 		else if( strcmp( inputCommand , "quit" ) == 0 ) {
 			save();
 			return 0;
@@ -295,8 +197,9 @@ int main(){
 		else if( strcmp( inputCommand , "help" ) == 0 ) {
 			printf("This are all the possible commands:\n");
 			printf("\tadd\t: add an entry to the password list\n");
-			printf("\tremove\t: add an entry to the password list\n");
+			printf("\tremove\t: remove an entry from the password list\n");
 			printf("\tget\t: get an entry from the password list\n");
+			printf("\tgetAll\t: get all entries from the password list\n");
 			printf("\tquit\t: quit the program\n");
 			printf("\tdestroy\t: destroy the password list and any configuration\n");
 			printf("\thelp\t: gives help about the usage of password-keeper\n");
