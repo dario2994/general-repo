@@ -1,5 +1,3 @@
-//TODO: Implementare l'import da file
-//TODO: Implementare l'export su file
 //TODO: Implementare i backup criptati.
 
 #include <cassert>
@@ -13,12 +11,12 @@
 #include "modifyList.hpp"
 using namespace std;
 
-char execCommand[1000], inputCommand[1000];
+char execCommand[MAXEXECLEN], inputCommand[MAXINPUTLEN];
 char privateKey[MAXPRIVATEKEYLEN];
 
 vector <entry*> Entries;
 
-char home[100], mainFolder[100], privateKeyHash[100], PasswordList[100];
+char home[MAXPATHLEN], mainFolder[MAXPATHLEN], privateKeyHash[MAXPATHLEN], PasswordList[MAXPATHLEN];
 void initPath() {
 	strcpy(home,getenv("HOME"));
 	strcpy(mainFolder,home);
@@ -29,6 +27,15 @@ void initPath() {
 	strcat(PasswordList, "/.passwordList.txt");
 	
 	//~ printf("%s %s %s %s", home, mainFolder, privateKeyHash, PasswordList);
+}
+
+void savePrivateKeyHash() {
+	FILE* passOut= fopen(privateKeyHash, "w");
+	assert(passOut!=NULL);
+	char hashed[MAXHASHLEN];
+	hashPassword( privateKey , hashed );
+	fprintf( passOut, "%s\n", hashed );
+	fclose(passOut);
 }
 
 void save() {
@@ -44,11 +51,103 @@ void save() {
 	fclose(out);
 }
 
+bool decisionForm(const char* question){
+	while ( 1 ) {
+		printf("%s (yes or no) ", question);
+		fgets2(inputCommand,MAXINPUTLEN,stdin);
+		if(strcmp(inputCommand,"yes")==0) return true;
+		else if(strcmp(inputCommand,"no")==0) return false;
+		else {
+			printf("You have to answer yes or no.\n");
+		}
+	} 
+}
+
+void importPasswords() {
+	bool sepBool=decisionForm("Is the separator between place,user,password used (otherwise space will be used)?");
+	char separator[20];
+	if(sepBool) strcpy(separator,SEPARATOR);
+	else strcpy(separator," ");
+	int sepLen=strlen(separator);
+	
+	printf("Write the absolute file path from which import: ");
+	fgets2(inputCommand,MAXINPUTLEN,stdin);
+	FILE* source=fopen(inputCommand,"r");
+	
+	int nn, collNum=0, errLine=0;
+	fscanf(source,"%d\n",&nn);
+	for( int i=0;i<nn;i++){
+		entry* newOne=new entry();
+		fgets2(inputCommand,MAXINPUTLEN,source);
+		bool goodLine=true;
+		char* pointer1=strstr(inputCommand,separator);
+		if( pointer1 == NULL ) goodLine=false;
+		else{
+			*pointer1='\0';
+			strcpy(newOne->place,inputCommand);
+			pointer1+=sepLen;
+			char* pointer2=strstr(pointer1,separator);
+			if( pointer2 == NULL) goodLine=false;
+			else {
+				*pointer2='\0';
+				strcpy(newOne->user,pointer1);
+				pointer2+=sepLen;
+				char* pointer3=strstr(pointer2,separator);
+				if(pointer3 != NULL) goodLine=false;
+				else {
+					strcpy(newOne->pass,pointer2);
+				}
+			}
+		}
+		
+		if( goodLine ) {
+			if( !searchCollisions(newOne) ) Entries.push_back(newOne);
+			else collNum++;
+		}
+		else errLine++;
+	}
+	
+	save();
+	
+	printf("\nAll passwords have been imported (%d collisions).\n", collNum);
+}
+
+void exportPasswords() {
+	bool sepBool=decisionForm("Do you want a separator between place,user,password (suggested if some spaces are used)?");
+	char separator[20];
+	if(sepBool) strcpy(separator,SEPARATOR);
+	else strcpy(separator," ");
+	bool fileBool=decisionForm("Do you want to export in a file?");
+	
+	FILE* dest;
+	
+	if(fileBool) {
+		printf("Write the absolute file path: ");
+		fgets2(inputCommand,MAXINPUTLEN,stdin);
+		dest=fopen(inputCommand,"w");
+	}
+	else dest=stdout;
+	
+	printf("\n");
+	printf("%d\n",(int)Entries.size());
+	for( int i=0;i<(int)Entries.size();i++){
+		entry* x=Entries[i];
+		fprintf(dest,"%s%s%s%s%s\n",x->place,separator,x->user,separator,x->pass);
+	}
+	if(fileBool) printf("\nAll passwords have been saved in %s.\n", inputCommand);
+	else printf("\nAll passwords have been printed.\n");
+}
+
 void destroy () { //Deletes the folder if present
 	strcpy(execCommand,"rm -fr ");
 	strcat(execCommand,mainFolder);
-	system(execCommand);
-	
+	system(execCommand);	
+}
+
+void changePrivateKey() {
+	fgets2(privateKey,MAXPRIVATEKEYLEN,stdin);
+	savePrivateKeyHash();
+	save();
 }
 
 void init () {
@@ -58,7 +157,7 @@ void init () {
 	printf("This is the first time you execute password-keeper.\n\n");
 	
 	//TODO AGGIUNGERE ANCHE CONTROLLI SULLA PASSWORD
-	printf("Insert a password to encrypt your data: ");
+	printf("Insert a private key to encrypt your data: ");
 	fgets2(privateKey,MAXPRIVATEKEYLEN,stdin);
 	
 	//Creates the new folder
@@ -66,12 +165,7 @@ void init () {
 	strcat(execCommand,mainFolder);
 	system(execCommand);
 	
-	FILE* passOut= fopen(privateKeyHash, "w");
-	assert(passOut!=NULL);
-	char hashed[MAXHASHLEN];
-	hashPassword( privateKey , hashed );
-	fprintf( passOut, "%s\n", hashed );
-	fclose(passOut);
+	savePrivateKeyHash();
 	
 	FILE* listOut=fopen(PasswordList,"w");
 	fprintf(listOut,"0\n");
@@ -133,8 +227,6 @@ int main(){
 		} while( login( ) == 1 );
 	}
 	
-	//~ return;
-	
 	readAllPass();
 	
 	while(1) {
@@ -142,55 +234,31 @@ int main(){
 		
 		fgets2(inputCommand, 1000, stdin);
 		
-		if( strcmp( inputCommand , "add" ) == 0 ) {
-			entry* newOne=new entry();
-			printf("Place: ");
-			fgets2(newOne->place,MAXPLACELEN,stdin);
-			printf("User: ");
-			fgets2(newOne->user,MAXPLACELEN,stdin);
-			printf("Password: ");
-			fgets2(newOne->pass,MAXPASSLEN,stdin);
-			
-			add( newOne );
-			
-		}
+		if( strcmp( inputCommand , "add" ) == 0 ) add();
 		
-		else if( strcmp( inputCommand , "remove" ) == 0 ) {
-			char place[MAXPLACELEN];
-			printf("Place: ");
-			fgets2(place,MAXPLACELEN,stdin);
-			remove( place );
-		}
+		else if( strcmp( inputCommand , "remove" ) == 0 ) remove();
 		
-		else if( strcmp( inputCommand , "get" ) == 0 ) {
-			char place[MAXPLACELEN];
-			printf("Place: ");
-			fgets2(place,MAXPLACELEN,stdin);
-			retrieve( place );
-		}
+		else if( strcmp( inputCommand , "get" ) == 0 ) get();
 		
-		else if( strcmp( inputCommand , "getAll" ) == 0 ) {
-			retrieveAll();
-		}
+		else if( strcmp( inputCommand , "getAll" ) == 0 ) getAll();
 		
 		else if( strcmp( inputCommand , "quit" ) == 0 ) {
 			save();
 			return 0;
 		}
 		
+		else if( strcmp( inputCommand , "import" ) ==0 ) importPasswords(); 
+		
+		else if( strcmp( inputCommand , "export" ) ==0 ) exportPasswords();
+		
+		else if( strcmp( inputCommand , "changeKey" ) == 0 ) changePrivateKey();
+		
 		else if( strcmp( inputCommand , "destroy" ) == 0 ) {
-			while(1) {
-				printf("Are you sure you want to delete all your saved password and configuration? (yes or no) ");
-				fgets2(inputCommand, 1000, stdin);
-				if( strcmp( inputCommand , "yes" ) == 0 ) {
-					destroy();
-					printf("Everything has been deleted.");
-					return 0;
-				} 
-				else if( strcmp( inputCommand , "no" ) == 0 ) break;
-				else {
-					printf("You have to answer yes or no\n");
-				}
+			bool desBool=decisionForm("Are you sure you want to delete all your saved password and configuration?");
+			if( desBool ) {
+				destroy();
+				printf("Everything has been deleted.");
+				return 0;
 			}
 		}
 		
@@ -201,6 +269,9 @@ int main(){
 			printf("\tget\t: get an entry from the password list\n");
 			printf("\tgetAll\t: get all entries from the password list\n");
 			printf("\tquit\t: quit the program\n");
+			printf("\texport\t: export the list of passwords\n");
+			printf("\timport\t: import the list of passwords\n");
+			printf("\tchangeKey\t: change the private key used for the encryption\n");
 			printf("\tdestroy\t: destroy the password list and any configuration\n");
 			printf("\thelp\t: gives help about the usage of password-keeper\n");
 		}

@@ -25,7 +25,7 @@ struct entry{
 };
 
 extern vector <entry*> Entries;
-extern char inputCommand[1000];
+extern char inputCommand[MAXINPUTLEN];
 
 vector <int> searchEntry( char* place ) {
 	vector <int> found;
@@ -45,7 +45,15 @@ bool searchCollisions( entry* val ) {
 	return false;
 }
 
-void add( entry* val ) {
+void add( ) {
+	entry* val=new entry();
+	printf("Place: ");
+	fgets2(val->place,MAXPLACELEN,stdin);
+	printf("User: ");
+	fgets2(val->user,MAXPLACELEN,stdin);
+	printf("Password: ");
+	fgets2(val->pass,MAXPASSLEN,stdin);
+	
 	vector <int> found=searchEntry(val->place);
 	int cc=found.size();
 	if ( cc == 0 ) { //If there isn't another entry with the same place
@@ -58,7 +66,7 @@ void add( entry* val ) {
 			printf("\t%d- User: %s ; Pass: %s\n",i+1,Entries[found[i]]->user, Entries[found[i]]->pass);
 		}
 		printf("Do you want to add a new entry (write new) or to update one of the entry (write its number)? ");
-		fgets2(inputCommand,10,stdin);
+		fgets2(inputCommand,MAXINPUTLEN,stdin);
 		if( strcmp(inputCommand,"new") == 0) { //Add a new if it doesn't collide
 			if( !searchCollisions(val) ) {
 				Entries.push_back(val);
@@ -87,7 +95,10 @@ void add( entry* val ) {
 	
 }
 
-void remove( char* place ) {
+void remove() {
+	char place[MAXPLACELEN];
+	printf("Place: ");
+	fgets2(place,MAXPLACELEN,stdin);
 	vector <int> found=searchEntry(place);
 	int cc=found.size();
 	if( cc==0 ) printf("The place %s isn't in the password list.\n", place);
@@ -101,7 +112,7 @@ void remove( char* place ) {
 			printf("\t%d- User: %s ; Pass: %s\n",i+1,Entries[found[i]]->user, Entries[found[i]]->pass);
 		}
 		printf("Which (* for all) should I delete? ");
-		fgets2(inputCommand,10,stdin);
+		fgets2(inputCommand,MAXINPUTLEN,stdin);
 		if( strcmp(inputCommand,"*") == 0 ) {
 			for(int i=cc-1; i>=0 ;i--) { //cancello dall'ultimo per non rompere i puntatori
 				assert( strcmp( Entries[found[i]]->place , place) == 0 );
@@ -122,7 +133,11 @@ void remove( char* place ) {
 	}
 }
 
-void retrieve( char* place ) {
+void get( ) {
+	char place[MAXPLACELEN];
+	printf("Place: ");
+	fgets2(place,MAXPLACELEN,stdin);
+	
 	vector <int> found=searchEntry(place);
 	int cc=found.size();
 	if( cc==0 ) printf("The place %s isn't in the password list.\n", place);
@@ -133,7 +148,7 @@ void retrieve( char* place ) {
 	}
 }
 
-void retrieveAll( ) {
+void getAll( ) {
 	for(int i=0;i<(int)Entries.size();i++) {
 		printf("Place: %s ; User: %s ; Pass : %s\n",
 			Entries[i]->place, Entries[i]->user, Entries[i]->pass);

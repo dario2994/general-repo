@@ -7,6 +7,10 @@
 #define MAXUSERLEN			50
 #define MAXPASSLEN			100
 #define MAXTEXTLEN			1000
+#define MAXPATHLEN			500
+#define MAXEXECLEN			500
+#define MAXINPUTLEN			500
+#define SEPARATOR			" #@?sep?@# "
 
 #include <stdio.h>
 #include <string.h>

@@ -7,6 +7,8 @@ using namespace std;
 
 //MAI A CAPI
 
+extern char privateKey[MAXPRIVATEKEYLEN];
+
 void hashPassword ( char* pass , char* dest) { //spara fuori sempre SOLO lettere o numeri
 	int l=strlen(pass);
 	unsigned long long int hashResult=0, p=1;
@@ -27,21 +29,28 @@ void hashPassword ( char* pass , char* dest) { //spara fuori sempre SOLO lettere
 
 void encrypt ( char* text , char* dest) { //spara fuori sempre SOLO lettere o numeri
 	char S[MAXTEXTLEN];
+	int l=strlen(privateKey);
 	for(int i=0;i<(int)strlen(text);i++){
-		if( text[i]!=' ' )S[i]=text[i];
-		else S[i]='&';
+		//~ if( text[i]!=' ' )S[i]=text[i];
+		//~ else S[i]='&';
+		int c=text[i]^privateKey[i%l];
+		S[2*i]='0'+char(c/26);
+		S[2*i+1]='a'+char(c%26);
 	}
-	S[strlen(text)]='\0';
+	S[2*strlen(text)]='\0';
 	strcpy(dest,S);
 }
 
 void decrypt ( char* text , char* dest ) { //prende sempre SOLO lettere o numeri
 	char S[MAXTEXTLEN];
+	int l=strlen(privateKey);
 	for(int i=0;i<(int)strlen(text);i++){
-		if( text[i]!='&' )S[i]=text[i];
-		else S[i]=' ';
+		//~ if( text[i]!='&' )S[i]=text[i];
+		//~ else S[i]=' ';
+		int c=int(text[2*i]-'0')*26+int(text[2*i+1]-'a');
+		S[i]=char(c)^privateKey[i%l];
 	}
-	S[strlen(text)]='\0';
+	S[strlen(text)/2]='\0';
 	strcpy(dest,S);
 }
 
