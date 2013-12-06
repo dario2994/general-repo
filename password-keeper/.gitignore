@@ -1,0 +1,9 @@
+*.gch
+*.o
+password-keeper
+crypt
+defines
+modifyList
+
+#stupid gedit
+*~
