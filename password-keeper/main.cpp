@@ -10,7 +10,7 @@
 #include <unistd.h>
 
 #include "header.hpp"
-using namespace std;
+using namespace std; 
 
 string privateKey;
 vector <entry*> Entries;
@@ -32,85 +32,6 @@ void save() {
 		out << ee->place << " " << ee->user << " " << ee->pass << "\n";
 	}
 	out.close();
-}
-
-void importPasswords() {
-	bool sepBool=decisionForm("Is the separator between place,user,password used (otherwise space will be used)?");
-	string separator;
-	if(sepBool) separator=SEPARATOR;
-	else separator=" ";
-
-	string sourcePath;
-	while( 1 ) {
-		sourcePath=questionForm("Write the absolute file path from which to import: ");
-		if( access( sourcePath.c_str() , R_OK ) == 0 ) break;
-		cout << "The path entered doesn't correspond to a readable file.\n";
-	}
-	
-	ifstream source( sourcePath.c_str() );
-	
-	int nn, collNum=0, errLine=0;
-	
-	source >> nn;
-	string stupidNewLine;//To avoid errors with getline
-	getline(source,stupidNewLine);
-	
-	for( int i=0;i<nn;i++){
-		entry* newOne=new entry();
-		string line;
-		getline(source,line);
-		vector <string> pieces=splitString(line,separator);
-		if( pieces.size() != 3 ) errLine++;
-		else {
-			newOne->place=pieces[0];
-			newOne->user=pieces[1];
-			newOne->pass=pieces[2];
-			if( !searchCollisions(newOne) ) Entries.push_back(newOne);
-			else collNum++;
-		}
-	}
-	
-	save();
-	cout << "\nAll passwords have been imported (" << collNum << " collisions and " << errLine << " errors)\n";
-}
-
-void exportPasswords() {
-	bool sepBool=decisionForm("Do you want a separator between place,user,password (suggested if some spaces are used)?");
-	string separator;
-	if(sepBool) separator=SEPARATOR;
-	else separator=" ";
-	bool fileBool=decisionForm("Do you want to export in a file?");
-	
-	if(fileBool) {
-		ofstream dest( questionForm("Write the absolute path:").c_str() );
-		dest << Entries.size() << "\n";
-		for( int i=0;i<(int)Entries.size();i++){
-			entry* x=Entries[i];
-			dest << x->place << separator << x->user << separator << x->pass << "\n";
-		}
-		dest.close();
-		cout << "\nAll passwords have been saved in the specified file.\n";
-	}
-	
-	else {
-		cout << "\n";
-		cout << Entries.size() << "\n";
-		for( int i=0;i<(int)Entries.size();i++){
-			entry* x=Entries[i];
-			cout << x->place << separator << x->user << separator << x->pass << "\n";
-		}
-		cout << "\nAll passwords have been printed.\n";
-	}
-}
-
-void destroy () { //Deletes the folder if present
-	system( ("rm -fr "+mainFolder).c_str() );
-}
-
-void changePrivateKey() {
-	privateKey = questionForm("Insert the private key (used for encryption):");
-	savePrivateKeyHash();
-	save();
 }
 
 void init () {
@@ -212,8 +133,8 @@ int main(){
 			cout << "\tget\t: get an entry from the password list\n";
 			cout << "\tgetAll\t: get all entries from the password list\n";
 			cout << "\tquit\t: quit the program\n";
-			cout << "\texport\t: export the list of passwords\n";
 			cout << "\timport\t: import the list of passwords\n";
+			cout << "\texport\t: export the list of passwords\n";
 			cout << "\tchangeKey\t: change the private key used for the encryption\n";
 			cout << "\tdestroy\t: destroy the password list and any configuration\n";
 			cout << "\thelp\t: gives help about the usage of password-keeper\n";

@@ -7,6 +7,15 @@
 #include "header.hpp"
 using namespace std;
 
+
+void entry::enc(){
+	pass=encrypt(pass);
+}
+
+void entry::dec(){
+	pass=decrypt(pass);
+}
+
 string questionForm(string question) {
 	cout << question << " ";
 	string answer;

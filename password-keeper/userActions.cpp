@@ -7,22 +7,14 @@
 #include "header.hpp"
 using namespace std;
 
-
-void entry::enc(){
-	pass=encrypt(pass);
-}
-
-void entry::dec(){
-	pass=decrypt(pass);
-}
-
+//Search in Entries for for place. Return the indexes.
 vector <int> searchEntry( string place ) {
 	vector <int> found;
 	for( int i=0;i<(int)Entries.size();i++) if( Entries[i]->place == place ) found.push_back(i);
 	return found;
 }
 
-//Search in entries for the exact same pair (place,user) of val. Return true if present, false otherwise.
+//Search in Entries for the exact same pair (place,user) of val. Return true if present, false otherwise.
 bool searchCollisions( entry* val ) {
 	for(int i=0;i<(int)Entries.size();i++) {
 		if( Entries[i]->place==val->place and Entries[i]->user==val->user ){
@@ -32,6 +24,7 @@ bool searchCollisions( entry* val ) {
 	return false;
 }
 
+//Add an entry.
 void add( ) {
 	entry* val=new entry();
 	cout << "Place: ";
@@ -84,6 +77,7 @@ to update one of the entry (write its number)?");
 	
 }
 
+//Remove an entry.
 void remove() {
 	cout << "Place: ";
 	string place;
@@ -125,6 +119,7 @@ void remove() {
 	}
 }
 
+//Retrieve an entry.
 void retrieve( ) {
 	cout << "Place: ";
 	string place;
@@ -141,9 +136,89 @@ void retrieve( ) {
 	}
 }
 
+//Retrieve (and show) all entries.
 void retrieveAll( ) {
 	for(int i=0;i<(int)Entries.size();i++) {
 		entry* x=Entries[i];
 		cout << "Place: " << x->place << " ; User: " << x->user << " ; Pass : " << x->pass << "\n";
 	}
+}
+
+void importPasswords() {
+	bool sepBool=decisionForm("Is the separator between place,user,password used (otherwise space will be used)?");
+	string separator;
+	if(sepBool) separator=SEPARATOR;
+	else separator=" ";
+
+	string sourcePath;
+	while( 1 ) {
+		sourcePath=questionForm("Write the absolute file path from which to import: ");
+		if( access( sourcePath.c_str() , R_OK ) == 0 ) break;
+		cout << "The path entered doesn't correspond to a readable file.\n";
+	}
+	
+	ifstream source( sourcePath.c_str() );
+	
+	int nn, collNum=0, errLine=0;
+	
+	source >> nn;
+	string stupidNewLine;//To avoid errors with getline
+	getline(source,stupidNewLine);
+	
+	for( int i=0;i<nn;i++){
+		entry* newOne=new entry();
+		string line;
+		getline(source,line);
+		vector <string> pieces=splitString(line,separator);
+		if( pieces.size() != 3 ) errLine++;
+		else {
+			newOne->place=pieces[0];
+			newOne->user=pieces[1];
+			newOne->pass=pieces[2];
+			if( !searchCollisions(newOne) ) Entries.push_back(newOne);
+			else collNum++;
+		}
+	}
+	
+	save();
+	cout << "\nAll passwords have been imported (" << collNum << " collisions and " << errLine << " errors)\n";
+}
+
+void exportPasswords() {
+	bool sepBool=decisionForm("Do you want a separator between place,user,password (suggested if some spaces are used)?");
+	string separator;
+	if(sepBool) separator=SEPARATOR;
+	else separator=" ";
+	bool fileBool=decisionForm("Do you want to export in a file?");
+	
+	if(fileBool) {
+		ofstream dest( questionForm("Write the absolute path:").c_str() );
+		dest << Entries.size() << "\n";
+		for( int i=0;i<(int)Entries.size();i++){
+			entry* x=Entries[i];
+			dest << x->place << separator << x->user << separator << x->pass << "\n";
+		}
+		dest.close();
+		cout << "\nAll passwords have been saved in the specified file.\n";
+	}
+	
+	else {
+		cout << "\n";
+		cout << Entries.size() << "\n";
+		for( int i=0;i<(int)Entries.size();i++){
+			entry* x=Entries[i];
+			cout << x->place << separator << x->user << separator << x->pass << "\n";
+		}
+		cout << "\nAll passwords have been printed.\n";
+	}
+}
+
+void changePrivateKey() {
+	privateKey = questionForm("Insert the private key (used for encryption):");
+	savePrivateKeyHash();
+	save();
+}
+
+void destroy () { //Deletes the folder if present
+	system( ("rm -fr "+mainFolder).c_str() );
 }
