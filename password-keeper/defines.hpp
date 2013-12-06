@@ -1,24 +1,54 @@
 #ifndef passwordkeeper_defines
 #define passwordkeeper_defines
 
-#define MAXPRIVATEKEYLEN	100
-#define MAXHASHLEN			20
-#define MAXPLACELEN			100
-#define MAXUSERLEN			50
-#define MAXPASSLEN			100
-#define MAXTEXTLEN			1000
-#define MAXPATHLEN			500
-#define MAXEXECLEN			500
-#define MAXINPUTLEN			500
 #define SEPARATOR			" #@?sep?@# "
 
 #include <stdio.h>
-#include <string.h>
+#include <stdlib.h>
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
 
-void fgets2(char* destination, int limitSize, FILE* source) {
-	fgets(destination, limitSize, source);
-	int l=strlen(destination);
-	if( l>=1 and destination[l-1]=='\n' ) destination[l-1]='\0';
+string questionForm(string question) {
+	cout << question << " ";
+	string answer;
+	getline(cin,answer);
+	return answer;
+}
+
+bool decisionForm(string question){
+	while ( 1 ) {
+		string answer=questionForm(question+" (yes or no)");
+		if( answer == "yes" ) return true;
+		else if( answer == "no") return false;
+		else {
+			cout << "You have to answer yes or no.\n";
+		}
+	} 
+}
+
+vector <string> splitString(string S, string P) {
+	vector <string> res;
+	int pp=0;
+	while( 1 ) {
+		int px=S.find(P,pp);
+		if( px==-1 ){
+			res.push_back( S.substr(pp,S.size()-pp) );
+			break;
+		}
+		res.push_back( S.substr(pp,px-pp) );
+		pp=px+P.size();
+	}
+	return res;
+}
+
+string home, mainFolder, privateKeyHash, PasswordList;
+void initPath() {
+	home=getenv("HOME");
+	mainFolder=home+"/.password-keeper";
+	privateKeyHash=mainFolder+"/.privateKeyHash.txt";
+	PasswordList=mainFolder+"/.passwordList.txt";
 }
 
 #endif

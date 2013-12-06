@@ -1,16 +1,15 @@
 #ifndef passwordkeeper_crypt
 #define passwordkeeper_crypt
 
-#include <string.h>
 #include "defines.hpp"
 using namespace std;
 
 //MAI A CAPI
 
-extern char privateKey[MAXPRIVATEKEYLEN];
+extern string privateKey;
 
-void hashPassword ( char* pass , char* dest) { //spara fuori sempre SOLO lettere o numeri
-	int l=strlen(pass);
+string hashPassword ( string pass ) { //spara fuori sempre SOLO lettere o numeri
+	int l=pass.size();
 	unsigned long long int hashResult=0, p=1;
 	for(int i=0;i<l;i++) hashResult+=(unsigned long long int)(pass[i])*p, p*=29;
 	
@@ -21,37 +20,35 @@ void hashPassword ( char* pass , char* dest) { //spara fuori sempre SOLO lettere
 	
 	while ( hashResult > 0 ) hash2 += hashResult%10ull, hashResult/=10ull;
 	
-	
+	string res;
 	int j=0;
-	while( hash2 > 0 ) dest[j]='a'+char(hash2%26ull), j++, hash2/=26ull;
-	dest[j]='\0';
+	while( hash2 > 0 ) res+='a'+char(hash2%26ull), j++, hash2/=26ull;
+	return res;
 }
 
-void encrypt ( char* text , char* dest) { //spara fuori sempre SOLO lettere o numeri
-	char S[MAXTEXTLEN];
-	int l=strlen(privateKey);
-	for(int i=0;i<(int)strlen(text);i++){
-		//~ if( text[i]!=' ' )S[i]=text[i];
-		//~ else S[i]='&';
+string encrypt ( string text ) { //spara fuori sempre SOLO lettere o numeri
+	int l=privateKey.size();
+	string res;
+	res.resize(2*text.size());
+	
+	for(int i=0;i<(int)text.size();i++){
 		int c=text[i]^privateKey[i%l];
-		S[2*i]='0'+char(c/26);
-		S[2*i+1]='a'+char(c%26);
+		res[2*i]='0'+char(c/26);
+		res[2*i+1]='a'+char(c%26);
 	}
-	S[2*strlen(text)]='\0';
-	strcpy(dest,S);
+	return res;
 }
 
-void decrypt ( char* text , char* dest ) { //prende sempre SOLO lettere o numeri
-	char S[MAXTEXTLEN];
-	int l=strlen(privateKey);
-	for(int i=0;i<(int)strlen(text);i++){
-		//~ if( text[i]!='&' )S[i]=text[i];
-		//~ else S[i]=' ';
+string decrypt ( string text ) { //prende sempre SOLO lettere o numeri
+	string res;
+	res.resize(text.size()/2);
+	
+	int l=privateKey.size();
+	for(int i=0;i<(int)text.size();i++){
 		int c=int(text[2*i]-'0')*26+int(text[2*i+1]-'a');
-		S[i]=char(c)^privateKey[i%l];
+		res[i]=char(c)^privateKey[i%l];
 	}
-	S[strlen(text)/2]='\0';
-	strcpy(dest,S);
+	return res;
 }
 
 #endif
