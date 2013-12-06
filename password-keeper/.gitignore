@@ -1,9 +1,5 @@
-*.gch
 *.o
-password-keeper
-crypt
-defines
-modifyList
+passwordKeeper
 
 #stupid gedit
 *~
