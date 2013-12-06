@@ -1,13 +1,10 @@
-#ifndef passwordkeeper_defines
-#define passwordkeeper_defines
-
-#define SEPARATOR	" #@?sep?@# "
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
 #include <vector>
 #include <string>
+
+#include "header.hpp"
 using namespace std;
 
 string questionForm(string question) {
@@ -50,5 +47,3 @@ void initPath() {
 	privateKeyHash=mainFolder+"/.privateKeyHash.txt";
 	PasswordList=mainFolder+"/.passwordList.txt";
 }
-
-#endif

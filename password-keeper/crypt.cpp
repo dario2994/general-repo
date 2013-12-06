@@ -1,13 +1,9 @@
-#ifndef passwordkeeper_crypt
-#define passwordkeeper_crypt
-
-//~ #include "defines.hpp"
 #include <string>
+
+#include "header.hpp"
 using namespace std;
 
 //MAI A CAPI
-
-extern string privateKey;
 
 string hashPassword ( string pass ) { //spara fuori sempre SOLO lettere o numeri
 	int l=pass.size();
@@ -52,4 +48,3 @@ string decrypt ( string text ) { //prende sempre SOLO lettere o numeri
 	return res;
 }
 
-#endif

@@ -1,14 +1,10 @@
-#ifndef passwordkeeper_modifyList
-#define passwordkeeper_modifyList
-
-
 #include <assert.h>
 #include <stdlib.h>
 #include <iostream>
 #include <string>
 #include <vector>
-//~ #include "defines.hpp"
-//~ #include "crypt.hpp"
+
+#include "header.hpp"
 using namespace std;
 
 
@@ -19,8 +15,6 @@ void entry::enc(){
 void entry::dec(){
 	pass=decrypt(pass);
 }
-
-??extern vector <entry*> Entries; 
 
 vector <int> searchEntry( string place ) {
 	vector <int> found;
@@ -153,5 +147,3 @@ void retrieveAll( ) {
 		cout << "Place: " << x->place << " ; User: " << x->user << " ; Pass : " << x->pass << "\n";
 	}
 }
-
-#endif

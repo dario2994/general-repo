@@ -8,16 +8,12 @@
 #include <vector>
 #include <string>
 #include <unistd.h>
-//~ #include "defines.hpp"
-//~ #include "crypt.hpp"
-//~ #include "modifyList.hpp"
+
+#include "header.hpp"
 using namespace std;
 
 string privateKey;
-
 vector <entry*> Entries;
-
-extern string home, mainFolder, privateKeyHash, PasswordList;
 
 void savePrivateKeyHash() {
 	ofstream passOut(privateKeyHash.c_str());
