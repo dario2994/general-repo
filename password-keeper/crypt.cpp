@@ -1,6 +1,6 @@
 #include <string>
 #include <vector>
-//~ #include <iostream>
+#include <iostream>
 #include "header.hpp"
 using namespace std;
 
@@ -23,6 +23,12 @@ uint k[64]={0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111
 	0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
 	0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2};
 char base16[16]={'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
+
+suint inverse16(char x){
+	for(int i=0;i<16;i++)if(base16[i]==x) return i;
+	cout << "Err: the char " << x << " is not in [0..9] or [a..f].\n";
+	return 16;
+}
 
 string sha256( string S ) {
 	uint h[8]= {0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
@@ -101,7 +107,7 @@ string hashPassword ( string pass ) {
 
 //Encripta usando un classico xor ma mischiato con sha della chiave e somma delle entrate del testo.
 string encrypt ( string text , string key ) {
-	
+	//~ cout << text << " " << key << "\n";
 	vector <suint> T;
 	T.resize(2*text.size());
 	for(int i=0;i<(int)text.size();i++) {
@@ -111,27 +117,16 @@ string encrypt ( string text , string key ) {
 	for(int i=1;i<(int)T.size();i++)T[i]=(T[i]+T[i-1])%16;
 	
 	string hashedKey=sha256(key+"Cucciola ti voglio bene");
+	cout << key << " " << hashedKey << "\n";
 	vector <suint> H;
 	H.resize(hashedKey.size());
-	for(int i=0;i<(int)hashedKey.size();i++) {
-		for(int j=0;j<16;j++) if(base16[j]==hashedKey[i]) H[i]=j;
-	}
+	for(int i=0;i<(int)hashedKey.size();i++) H[i]=inverse16(hashedKey[i]);
 	
 	string res;
 	res.resize(T.size());
 	for(int i=0;i<(int)T.size();i++)res[i]=base16[ T[i]^H[i%(H.size())] ];
 
 	return res;
-	//~ int l=key.size();
-	//~ string res;
-	//~ res.resize(2*text.size());
-	
-	//~ for(int i=0;i<(int)text.size();i++){
-		//~ int c=text[i]^key[i%l];
-		//~ res[2*i]='0'+char(c/26);
-		//~ res[2*i+1]='a'+char(c%26);
-	//~ }
-	//~ return res;
 }
 
 //Inverso di encrypt
@@ -139,34 +134,31 @@ string decrypt ( string text , string key ) {
 	string hashedKey=sha256(key+"Cucciola ti voglio bene");
 	vector <suint> H;
 	H.resize(hashedKey.size());
-	for(int i=0;i<(int)hashedKey.size();i++) {
-		for(int j=0;j<16;j++) if(base16[j]==hashedKey[i]) H[i]=j;
-	}
+	for(int i=0;i<(int)hashedKey.size();i++) H[i]=inverse16(hashedKey[i]);
 
 	vector <suint> T;
 	T.resize(text.size());
-	for(int i=0;i<(int)text.size();i++) T[i]=text[i]^H[i];
-	//~ string res;
-	//~ res.resize(text.size()/2);
-	//~ 
-	//~ int l=key.size();
-	//~ for(int i=0;i<(int)text.size()/2;i++){
-		//~ int c=int(text[2*i]-'0')*26+int(text[2*i+1]-'a');
-		//~ res[i]=char(c)^key[i%l];
-	//~ }
-	//~ return res;
+	for(int i=0;i<(int)text.size();i++) T[i]=inverse16(text[i])^H[i%(H.size())];
+	for(int i=(int)T.size()-1;i>0;i--) T[i]=(16+T[i]-T[i-1])%16;
+
+	string res;
+	res.resize(T.size()/2);
+	for(int i=0;i<(int)T.size()/2;i++){
+		res[i]=(char)(T[2*i]+ (T[2*i+1]<<4) );
+	}
+	return res;
 }
 
 void entry::enc( string key ){
+	pass=encrypt( pass, key+place+user );
 	place=removeSpaces( place );
 	user=removeSpaces( user );
-	pass=encrypt( pass, key );
 }
 
 void entry::dec( string key ){
 	place=addSpaces( place );
 	user=addSpaces( user );
-	pass=decrypt( pass , key );
+	pass=decrypt( pass , key+place+user );
 }
 
 

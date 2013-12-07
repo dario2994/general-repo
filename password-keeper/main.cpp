@@ -1,3 +1,6 @@
+//BUG: usando importExample.txt le password risultano molto più simili dopo la criptatura di quanto non dovrebbero.
+//Il bug è dovuto ad un errore della funzione sha che non considera il finale di stringa.
+
 //TODO: Implementare i backup criptati.
 //TODO: Togliere gli spazi a place e user
 
@@ -72,6 +75,7 @@ void readAllPass( ) {
 
 bool login () {
 	privateKey=questionForm("Password:");
+	//DEBUG
 	if( privateKey == "debugdestroy" ) {
 		destroy();
 		cout << "Debug destroy.\n";
@@ -91,9 +95,6 @@ bool login () {
 }
 
 int main(){
-	
-	//~ splitString( "dasa#?afdsgaha#?ghhha#?aaasd" , "#?" );
-	//~ return 0;
 	
 	initPath();
 	
