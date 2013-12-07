@@ -5,6 +5,7 @@
 using namespace std;
 
 typedef unsigned int uint;
+typedef unsigned short int suint;
 
 inline uint rightShift ( uint x, uint y ) {
 	return (x >> y);
@@ -92,6 +93,70 @@ string addSpaces ( string text ) {
 	return res; 
 }
 
+string hashPassword ( string pass ) {
+	string res=sha256(sha256(pass)+"Giada");
+	res=res.substr(0,16);
+	return res;
+}
+
+//Encripta usando un classico xor ma mischiato con sha della chiave e somma delle entrate del testo.
+string encrypt ( string text , string key ) {
+	
+	vector <suint> T;
+	T.resize(2*text.size());
+	for(int i=0;i<(int)text.size();i++) {
+		T[2*i]=(suint)text[i]%16;
+		T[2*i+1]=((suint)text[i])>>4;
+	}
+	for(int i=1;i<(int)T.size();i++)T[i]=(T[i]+T[i-1])%16;
+	
+	string hashedKey=sha256(key+"Cucciola ti voglio bene");
+	vector <suint> H;
+	H.resize(hashedKey.size());
+	for(int i=0;i<(int)hashedKey.size();i++) {
+		for(int j=0;j<16;j++) if(base16[j]==hashedKey[i]) H[i]=j;
+	}
+	
+	string res;
+	res.resize(T.size());
+	for(int i=0;i<(int)T.size();i++)res[i]=base16[ T[i]^H[i%(H.size())] ];
+
+	return res;
+	//~ int l=key.size();
+	//~ string res;
+	//~ res.resize(2*text.size());
+	
+	//~ for(int i=0;i<(int)text.size();i++){
+		//~ int c=text[i]^key[i%l];
+		//~ res[2*i]='0'+char(c/26);
+		//~ res[2*i+1]='a'+char(c%26);
+	//~ }
+	//~ return res;
+}
+
+//Inverso di encrypt
+string decrypt ( string text , string key ) {
+	string hashedKey=sha256(key+"Cucciola ti voglio bene");
+	vector <suint> H;
+	H.resize(hashedKey.size());
+	for(int i=0;i<(int)hashedKey.size();i++) {
+		for(int j=0;j<16;j++) if(base16[j]==hashedKey[i]) H[i]=j;
+	}
+
+	vector <suint> T;
+	T.resize(text.size());
+	for(int i=0;i<(int)text.size();i++) T[i]=text[i]^H[i];
+	//~ string res;
+	//~ res.resize(text.size()/2);
+	//~ 
+	//~ int l=key.size();
+	//~ for(int i=0;i<(int)text.size()/2;i++){
+		//~ int c=int(text[2*i]-'0')*26+int(text[2*i+1]-'a');
+		//~ res[i]=char(c)^key[i%l];
+	//~ }
+	//~ return res;
+}
+
 void entry::enc( string key ){
 	place=removeSpaces( place );
 	user=removeSpaces( user );
@@ -103,37 +168,5 @@ void entry::dec( string key ){
 	user=addSpaces( user );
 	pass=decrypt( pass , key );
 }
-
-string hashPassword ( string pass ) {
-	string res=sha256(sha256(pass)+"questo è dedicato a te");
-	res=res.substr(0,16);
-	return res;
-}
-
-string encrypt ( string text , string key ) { //spara fuori sempre SOLO lettere o numeri
-	int l=key.size();
-	string res;
-	res.resize(2*text.size());
-	
-	for(int i=0;i<(int)text.size();i++){
-		int c=text[i]^key[i%l];
-		res[2*i]='0'+char(c/26);
-		res[2*i+1]='a'+char(c%26);
-	}
-	return res;
-}
-
-string decrypt ( string text , string key ) { //prende sempre SOLO lettere o numeri
-	string res;
-	res.resize(text.size()/2);
-	
-	int l=key.size();
-	for(int i=0;i<(int)text.size()/2;i++){
-		int c=int(text[2*i]-'0')*26+int(text[2*i+1]-'a');
-		res[i]=char(c)^key[i%l];
-	}
-	return res;
-}
-
 
 

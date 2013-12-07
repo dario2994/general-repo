@@ -37,15 +37,16 @@ void remove();
 void retrieve();
 void retrieveAll();
 
+void importPasswords();
+void exportPasswords();
+void changePrivateKey();
+void destroy ();
+
 void savePrivateKeyHash();
 void save();
 void setPrivateKey( string );
-void importPasswords();
-void exportPasswords();
-void destroy ();
-void changePrivateKey();
-void init ();
-void readAllPass();
-bool login ();
+//~ void init ();
+//~ void readAllPass();
+//~ bool login ();
 
 #endif
