@@ -1,9 +1,7 @@
 #include <string>
-
+//~ #include <iostream>
 #include "header.hpp"
 using namespace std;
-
-//MAI A CAPI
 
 string removeSpaces ( string text ) {
 	string res;
@@ -32,7 +30,7 @@ void entry::enc( string key ){
 void entry::dec( string key ){
 	place=addSpaces( place );
 	user=addSpaces( user );
-	pass=decrypt( pass , key);
+	pass=decrypt( pass , key );
 }
 
 string hashPassword ( string pass ) { //spara fuori sempre SOLO lettere o numeri
@@ -71,10 +69,17 @@ string decrypt ( string text , string key ) { //prende sempre SOLO lettere o num
 	res.resize(text.size()/2);
 	
 	int l=key.size();
-	for(int i=0;i<(int)text.size();i++){
+	for(int i=0;i<(int)text.size()/2;i++){
 		int c=int(text[2*i]-'0')*26+int(text[2*i+1]-'a');
 		res[i]=char(c)^key[i%l];
 	}
 	return res;
 }
+
+string md5( string S ) {
+	vector <unsigned int> bits;
+	for(int i=0;i<
+}
+
+
 

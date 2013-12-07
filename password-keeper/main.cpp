@@ -89,6 +89,9 @@ bool login () {
 
 int main(){
 	
+	//~ splitString( "dasa#?afdsgaha#?ghhha#?aaasd" , "#?" );
+	//~ return 0;
+	
 	initPath();
 	
 	if( access(mainFolder.c_str() , F_OK) != 0 ) init();

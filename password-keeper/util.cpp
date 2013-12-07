@@ -35,7 +35,7 @@ vector <string> splitString(string S, string P) {
 			break;
 		}
 		res.push_back( S.substr(pp,px-pp) );
-		cout << res.back() << endl;
+		//~ cout << res.back() << endl;
 		pp=px+P.size();
 	}
 	return res;

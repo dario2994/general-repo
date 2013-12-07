@@ -24,6 +24,8 @@ string hashPassword( string );
 string encrypt ( string , string );
 string decrypt ( string , string );
 
+string md5( string );
+
 string questionForm( string );
 bool decisionForm( string );
 vector <string> splitString( string , string );
