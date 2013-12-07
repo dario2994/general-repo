@@ -41,10 +41,10 @@ vector <string> splitString(string S, string P) {
 	return res;
 }
 
-string home, mainFolder, privateKeyHash, PasswordList;
+string homePath, mainFolderPath, privateKeyHashPath, passwordListPath;
 void initPath() {
-	home=getenv("HOME");
-	mainFolder=home+"/.password-keeper";
-	privateKeyHash=mainFolder+"/.privateKeyHash.txt";
-	PasswordList=mainFolder+"/.passwordList.txt";
+	homePath=getenv("HOME");
+	mainFolderPath=homePath+"/.password-keeper";
+	privateKeyHashPath=mainFolderPath+"/.privateKeyHash.txt";
+	passwordListPath=mainFolderPath+"/.passwordList.txt";
 }

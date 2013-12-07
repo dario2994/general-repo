@@ -220,5 +220,5 @@ void changePrivateKey() {
 }
 
 void destroy () { //Deletes the folder if present
-	system( ("rm -fr "+mainFolder).c_str() );
+	system( ("rm -fr "+mainFolderPath).c_str() );
 }

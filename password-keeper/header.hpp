@@ -15,16 +15,15 @@ struct entry{
 };
 
 
-extern string home, mainFolder, privateKeyHash, PasswordList;
+extern string homePath, mainFolderPath, privateKeyHashPath, passwordListPath;
 extern vector <entry*> Entries;
 
-string removeSpaces ( string );
-string addSpaces ( string );
+//~ string removeSpaces ( string );
+//~ string addSpaces ( string );
 string hashPassword( string );
-string encrypt ( string , string );
-string decrypt ( string , string );
-
-string md5( string );
+//~ string encrypt ( string , string );
+//~ string decrypt ( string , string );
+//~ string sha256( string );
 
 string questionForm( string );
 bool decisionForm( string );

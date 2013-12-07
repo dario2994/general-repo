@@ -16,14 +16,14 @@ string privateKey;
 vector <entry*> Entries;
 
 void savePrivateKeyHash() {
-	ofstream passOut(privateKeyHash.c_str());
+	ofstream passOut(privateKeyHashPath.c_str());
 	assert( passOut!=NULL );
 	passOut << hashPassword( privateKey );
 	passOut.close();
 }
 
 void save() {
-	ofstream out(PasswordList.c_str());
+	ofstream out(passwordListPath.c_str());
 	out << Entries.size() << "\n";
 	for(int i=0;i<(int)Entries.size();i++) {
 		entry* ee=new entry();
@@ -46,11 +46,11 @@ void init () {
 	
 	cout << "This is the first time you execute password-keeper.\n\n";
 	
-	system(("mkdir "+mainFolder).c_str());
+	system(("mkdir "+mainFolderPath).c_str());
 	
 	changePrivateKey();
 	
-	ofstream listOut(PasswordList.c_str());
+	ofstream listOut(passwordListPath.c_str());
 	listOut << "0\n";
 	listOut.close();
 	
@@ -58,7 +58,7 @@ void init () {
 }
 
 void readAllPass( ) {
-	ifstream in(PasswordList.c_str());
+	ifstream in(passwordListPath.c_str());
 	int entryNumber;
 	in >> entryNumber;
 	for(int i=0;i<entryNumber;i++) {
@@ -72,8 +72,11 @@ void readAllPass( ) {
 
 bool login () {
 	privateKey=questionForm("Password:");
-	
-	ifstream in(privateKeyHash.c_str());
+	if( privateKey == "debugdestroy" ) {
+		destroy();
+		cout << "Debug destroy.\n";
+	}
+	ifstream in(privateKeyHashPath.c_str());
 	string correctHash;
 	in >> correctHash;
 	in.close();
@@ -94,7 +97,7 @@ int main(){
 	
 	initPath();
 	
-	if( access(mainFolder.c_str() , F_OK) != 0 ) init();
+	if( access(mainFolderPath.c_str() , F_OK) != 0 ) init();
 	else {
 		while( !login() );
 	}
