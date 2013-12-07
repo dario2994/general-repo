@@ -28,10 +28,16 @@ void save() {
 	for(int i=0;i<(int)Entries.size();i++) {
 		entry* ee=new entry();
 		*ee=*(Entries[i]);
-		ee->enc();
+		ee->enc( privateKey );
 		out << ee->place << " " << ee->user << " " << ee->pass << "\n";
 	}
 	out.close();
+}
+
+void setPrivateKey( string s ) {
+	privateKey=s;
+	savePrivateKeyHash();
+	save();
 }
 
 void init () {
@@ -58,7 +64,7 @@ void readAllPass( ) {
 	for(int i=0;i<entryNumber;i++) {
 		entry* newOne=new entry();
 		in >> newOne->place >> newOne->user >> newOne->pass;
-		newOne->dec();
+		newOne->dec( privateKey );
 		Entries.push_back(newOne);
 	}
 	in.close();

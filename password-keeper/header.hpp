@@ -6,21 +6,23 @@
 using namespace std;
 
 #define SEPARATOR	" #@?sep?@# "
+#define SPACESEP	"?^sp^?"
 
 struct entry{
 	string place,user,pass;
-	void enc();
-	void dec();
+	void enc(string);
+	void dec(string);
 };
 
 
 extern string home, mainFolder, privateKeyHash, PasswordList;
-extern string privateKey;
 extern vector <entry*> Entries;
 
+string removeSpaces ( string );
+string addSpaces ( string );
 string hashPassword( string );
-string encrypt ( string );
-string decrypt ( string );
+string encrypt ( string , string );
+string decrypt ( string , string );
 
 string questionForm( string );
 bool decisionForm( string );
@@ -36,6 +38,7 @@ void retrieveAll();
 
 void savePrivateKeyHash();
 void save();
+void setPrivateKey( string );
 void importPasswords();
 void exportPasswords();
 void destroy ();

@@ -1,6 +1,8 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <iostream>
+#include <fstream>
+#include <unistd.h>
 #include <string>
 #include <vector>
 
@@ -214,9 +216,7 @@ void exportPasswords() {
 }
 
 void changePrivateKey() {
-	privateKey = questionForm("Insert the private key (used for encryption):");
-	savePrivateKeyHash();
-	save();
+	setPrivateKey( questionForm("Insert the private key (used for encryption):") );
 }
 
 void destroy () { //Deletes the folder if present
