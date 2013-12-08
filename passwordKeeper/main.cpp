@@ -1,4 +1,7 @@
-//TODO: Implementare i backup criptati.
+//TODO: Incoerenza nell'import export non criptato. Attualmente se faccio un export e lo importo potrebbe non funzionare
+//		se decido di esportare senza spazi. (ma forse questo è anche normale)
+//TODO: Ha senso lasciar mettere il separatore se già si encripta? (e quindi si tolgono gli spazi?)
+//TODO: Implementare backup automatici?
 
 #include <assert.h>
 #include <stdlib.h>

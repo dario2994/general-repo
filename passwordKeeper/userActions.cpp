@@ -35,6 +35,7 @@ void add( ) {
 		val->pass = hiddenQuestionForm("Password:");
 		string pswCheck = hiddenQuestionForm("Insert again password:");
 		if( val->pass == pswCheck ) break;
+		else cout << "The second password doesn't correspond with the first. Try again.\n";
 	}
 	
 	vector <int> found=searchEntry(val->place);
@@ -149,6 +150,17 @@ void importPasswords() {
 	if(sepBool) separator=SEPARATOR;
 	else separator=" ";
 
+	bool encBool=decisionForm("Are the passwords in the file encrypted?");
+	string encKey;
+	if( encBool ) {
+		while (1) {
+			encKey=hiddenQuestionForm("Insert the key used for decryption:");
+			string pswCheck=hiddenQuestionForm("Insert again the key:");
+			if( encKey == pswCheck) break;
+			else cout << "The second key doesn't correspond with the first. Try again.\n";
+		}
+	}
+
 	string sourcePath;
 	while( 1 ) {
 		sourcePath=questionForm("Write the absolute file path from which to import: ");
@@ -174,6 +186,7 @@ void importPasswords() {
 			newOne->place=pieces[0];
 			newOne->user=pieces[1];
 			newOne->pass=pieces[2];
+			if( encBool ) newOne->dec(encKey);
 			if( !searchCollisions(newOne) ) Entries.push_back(newOne);
 			else collNum++;
 		}
@@ -188,6 +201,18 @@ void exportPasswords() {
 	string separator;
 	if(sepBool) separator=SEPARATOR;
 	else separator=" ";
+	
+	bool encBool=decisionForm("Do you want the passwords to be encrypted (otherwise just plain-text)?");
+	string encKey;
+	if( encBool ) {
+		while (1) {
+			encKey=hiddenQuestionForm("Insert the key to use for encryption:");
+			string pswCheck=hiddenQuestionForm("Insert again the key:");
+			if( encKey == pswCheck) break;
+			else cout << "The second key doesn't correspond with the first. Try again.\n";
+		}
+	}
+	
 	bool fileBool=decisionForm("Do you want to export in a file?");
 	
 	if(fileBool) {
@@ -195,7 +220,9 @@ void exportPasswords() {
 		dest << Entries.size() << "\n";
 		for( int i=0;i<(int)Entries.size();i++){
 			entry* x=Entries[i];
+			x->enc(encKey);
 			dest << x->place << separator << x->user << separator << x->pass << "\n";
+			x->dec(encKey);
 		}
 		dest.close();
 		cout << "\nAll passwords have been saved in the specified file.\n";
@@ -218,6 +245,7 @@ void changePrivateKey() {
 		privateKey = hiddenQuestionForm("Insert the private key (used for encryption):");
 		string pswCheck   = hiddenQuestionForm("Insert the private key again:");
 		if( privateKey == pswCheck ) break;
+		else cout << "The second key doesn't correspond with the first. Try again.\n";
 	}
 	setPrivateKey( privateKey );
 }

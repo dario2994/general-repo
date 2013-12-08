@@ -28,7 +28,7 @@ string hiddenQuestionForm(string question) {
 	system("stty -echo");
 	getline(cin,answer);
 	system("stty echo");
-	//~ cout << "\n";
+	cout << "\n";
 	return answer;
 }
 
