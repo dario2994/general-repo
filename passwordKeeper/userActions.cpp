@@ -216,7 +216,7 @@ void exportPasswords() {
 }
 
 void changePrivateKey() {
-	setPrivateKey( questionForm("Insert the private key (used for encryption):") );
+	setPrivateKey( hiddenQuestionForm("Insert the private key (used for encryption):") );
 }
 
 void destroy () { //Deletes the folder if present

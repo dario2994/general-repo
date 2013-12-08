@@ -1,8 +1,5 @@
-//BUG: usando importExample.txt le password risultano molto più simili dopo la criptatura di quanto non dovrebbero.
-//Il bug è dovuto ad un errore della funzione sha che non considera il finale di stringa.
-
 //TODO: Implementare i backup criptati.
-//TODO: Togliere gli spazi a place e user
+//TODO: Modificare add (e magari anche altro) per usare questionForm e hiddenQuestionForm()
 
 #include <assert.h>
 #include <stdlib.h>
@@ -74,7 +71,7 @@ void readAllPass( ) {
 }
 
 bool login () {
-	privateKey=questionForm("Password:");
+	privateKey=hiddenQuestionForm("Password:");
 	//DEBUG
 	if( privateKey == "debugdestroy" ) {
 		destroy();

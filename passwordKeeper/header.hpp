@@ -26,6 +26,7 @@ string hashPassword( string );
 //~ string sha256( string );
 
 string questionForm( string );
+string hiddenQuestionForm( string );
 bool decisionForm( string );
 vector <string> splitString( string , string );
 void initPath();

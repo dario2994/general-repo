@@ -116,7 +116,6 @@ string encrypt ( string text , string key ) {
 	for(int i=1;i<(int)T.size();i++)T[i]=(T[i]+T[i-1])%16;
 	
 	string hashedKey=sha256(key+"Cucciola ti voglio bene");
-	cout << key << " " << hashedKey << "\n";
 	vector <suint> H;
 	H.resize(hashedKey.size());
 	for(int i=0;i<(int)hashedKey.size();i++) H[i]=inverse16(hashedKey[i]);

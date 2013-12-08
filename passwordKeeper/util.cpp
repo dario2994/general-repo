@@ -14,6 +14,16 @@ string questionForm(string question) {
 	return answer;
 }
 
+string hiddenQuestionForm(string question) {
+	cout << question << " ";
+	string answer;
+	system("stty -echo");
+	getline(cin,answer);
+	system("stty echo");
+	cout << "\n";
+	return answer;
+}
+
 bool decisionForm(string question){
 	while ( 1 ) {
 		string answer=questionForm(question+" (yes or no)");
