@@ -43,11 +43,11 @@ string sha256( string S ) {
 	for(int i=0;i<l;i++) {
 		bits[i/4]|= ((uint)S[i])<<(8*(i%4));
 	}
-	while(bits.size()%16 != 0 )bits.push_back(0);
+	while(bits.size()%16 != 15 )bits.push_back(0); //non standard... manca il bit 1
 	bits.push_back(S.size());
 	
 	for(int chunk=0;chunk<(int)(bits.size()/16);chunk++) {
-		for(int i=0;i<16;i++)w[i]=S[chunk*16+i];
+		for(int i=0;i<16;i++)w[i]=bits[chunk*16+i];
 		for(int i=16;i<64;i++) {
 			s0 = ( rightRotate(w[i-15],7) )^( rightRotate(w[i-15],18) )^( rightShift(w[i-15],3) );
 			s1 = ( rightRotate(w[i-2],17) )^( rightRotate(w[i-2], 19) )^( rightShift(w[i-2],10) );
@@ -107,7 +107,6 @@ string hashPassword ( string pass ) {
 
 //Encripta usando un classico xor ma mischiato con sha della chiave e somma delle entrate del testo.
 string encrypt ( string text , string key ) {
-	//~ cout << text << " " << key << "\n";
 	vector <suint> T;
 	T.resize(2*text.size());
 	for(int i=0;i<(int)text.size();i++) {
