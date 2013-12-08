@@ -213,7 +213,13 @@ void exportPasswords() {
 }
 
 void changePrivateKey() {
-	setPrivateKey( hiddenQuestionForm("Insert the private key (used for encryption):") );
+	string privateKey;
+	while (1) {
+		privateKey = hiddenQuestionForm("Insert the private key (used for encryption):");
+		string pswCheck   = hiddenQuestionForm("Insert the private key again:");
+		if( privateKey == pswCheck ) break;
+	}
+	setPrivateKey( privateKey );
 }
 
 void destroy () { //Deletes the folder if present
