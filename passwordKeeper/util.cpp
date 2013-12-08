@@ -7,10 +7,18 @@
 #include "header.hpp"
 using namespace std;
 
+string strToAst(string S) {
+	string res;
+	res.resize(S.size());
+	for(int i=0;i<(int)S.size();i++)res[i]='*';
+	return res;
+}
+
 string questionForm(string question) {
 	cout << question << " ";
 	string answer;
 	getline(cin,answer);
+	//~ cout << "\n";
 	return answer;
 }
 
@@ -20,7 +28,7 @@ string hiddenQuestionForm(string question) {
 	system("stty -echo");
 	getline(cin,answer);
 	system("stty echo");
-	cout << "\n";
+	//~ cout << "\n";
 	return answer;
 }
 

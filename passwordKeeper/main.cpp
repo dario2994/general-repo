@@ -1,5 +1,4 @@
 //TODO: Implementare i backup criptati.
-//TODO: Modificare add (e magari anche altro) per usare questionForm e hiddenQuestionForm()
 
 #include <assert.h>
 #include <stdlib.h>
@@ -103,10 +102,7 @@ int main(){
 	readAllPass();
 	
 	while(1) {
-		cout << "> ";
-
-		string command;
-		getline(cin,command);
+		string command = questionForm(">");
 		
 		if( command == "add" ) add();
 		

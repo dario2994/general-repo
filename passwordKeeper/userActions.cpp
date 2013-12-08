@@ -29,12 +29,13 @@ bool searchCollisions( entry* val ) {
 //Add an entry.
 void add( ) {
 	entry* val=new entry();
-	cout << "Place: ";
-	getline(cin,val->place);
-	cout << "User: ";
-	getline(cin,val->user);
-	cout << "Password: ";
-	getline(cin,val->pass);
+	val->place = questionForm("Place:");
+	val->user = questionForm("User:");
+	while(1) {
+		val->pass = hiddenQuestionForm("Password:");
+		string pswCheck = hiddenQuestionForm("Insert again password:");
+		if( val->pass == pswCheck ) break;
+	}
 	
 	vector <int> found=searchEntry(val->place);
 	int cc=found.size();
@@ -46,7 +47,7 @@ void add( ) {
 		cout << val->place << " has already some entries:\n";
 		for(int i=0;i<cc;i++){ //list of entries with the same place
 			entry* x=Entries[found[i]];
-			cout << "\t" << i+1 << "- User: " << x->user << " ; Pass: " << x->pass << "\n";
+			cout << "\t" << i+1 << "- User: " << x->user << " ; Pass: " << strToAst(x->pass) << "\n";
 		}
 		string answer=questionForm("Do you want to add a new entry (write new) or \
 to update one of the entry (write its number)?");
@@ -81,9 +82,7 @@ to update one of the entry (write its number)?");
 
 //Remove an entry.
 void remove() {
-	cout << "Place: ";
-	string place;
-	getline(cin,place);
+	string place = questionForm("Place:");
 	
 	vector <int> found=searchEntry(place);
 	int cc=found.size();
@@ -96,7 +95,7 @@ void remove() {
 		cout << "The place " << place << " is present in more than one entry:\n";
 		for(int i=0;i<cc;i++){
 			entry* x=Entries[found[i]];
-			cout << "\t" << i+1 << "- User: " << x->user << " ; Pass: " << x->pass << "\n";
+			cout << "\t" << i+1 << "- User: " << x->user << " ; Pass: " << strToAst(x->pass) << "\n";
 		}
 		
 		string answer=questionForm("Which (* for all) should I delete?");
@@ -123,9 +122,7 @@ void remove() {
 
 //Retrieve an entry.
 void retrieve( ) {
-	cout << "Place: ";
-	string place;
-	getline(cin,place);
+	string place = questionForm("Place:");
 	
 	vector <int> found=searchEntry(place);
 	int cc=found.size();
