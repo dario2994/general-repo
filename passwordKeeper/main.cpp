@@ -71,11 +71,13 @@ void readAllPass( ) {
 
 bool login () {
 	privateKey=hiddenQuestionForm("Password:");
+	
 	//DEBUG
 	if( privateKey == "debugdestroy" ) {
 		destroy();
 		cout << "Debug destroy.\n";
 	}
+	
 	ifstream in(privateKeyHashPath.c_str());
 	string correctHash;
 	in >> correctHash;

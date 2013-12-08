@@ -158,5 +158,3 @@ void entry::dec( string key ){
 	user=addSpaces( user );
 	pass=decrypt( pass , key+place+user );
 }
-
-
