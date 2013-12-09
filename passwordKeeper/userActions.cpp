@@ -145,11 +145,6 @@ void retrieveAll( ) {
 }
 
 void importPasswords() {
-	bool sepBool=decisionForm("Is the separator between place,user,password used (otherwise space will be used)?");
-	string separator;
-	if(sepBool) separator=SEPARATOR;
-	else separator=" ";
-
 	bool encBool=decisionForm("Are the passwords in the file encrypted?");
 	string encKey;
 	if( encBool ) {
@@ -160,6 +155,12 @@ void importPasswords() {
 			else cout << "The second key doesn't correspond with the first. Try again.\n";
 		}
 	}
+	
+	bool sepBool=false;
+	if( !encBool ) sepBool=decisionForm("Is the separator between place,user,password used (otherwise space will be used)?");
+	string separator;
+	if(sepBool) separator=SEPARATOR;
+	else separator=" ";
 
 	string sourcePath;
 	while( 1 ) {
@@ -197,11 +198,6 @@ void importPasswords() {
 }
 
 void exportPasswords() {
-	bool sepBool=decisionForm("Do you want a separator between place,user,password (suggested if some spaces are used)?");
-	string separator;
-	if(sepBool) separator=SEPARATOR;
-	else separator=" ";
-	
 	bool encBool=decisionForm("Do you want the passwords to be encrypted (otherwise just plain-text)?");
 	string encKey;
 	if( encBool ) {
@@ -212,6 +208,12 @@ void exportPasswords() {
 			else cout << "The second key doesn't correspond with the first. Try again.\n";
 		}
 	}
+	
+	bool sepBool=false;
+	if( !encBool ) sepBool=decisionForm("Do you want a separator between place,user,password (suggested if some spaces are used)?");
+	string separator;
+	if(sepBool) separator=SEPARATOR;
+	else separator=" ";
 	
 	bool fileBool=decisionForm("Do you want to export in a file?");
 	
